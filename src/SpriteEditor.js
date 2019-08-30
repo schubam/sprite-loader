@@ -1,12 +1,10 @@
 import React from "react";
 import PictureCanvas from "./PictureCanvas";
 import LoadButton from "./LoadButton";
-import ScalingPictureCanvas from "./ScalingPictureCanvas";
 import Picture from "./picture";
 import ZoomTool from "./ZoomTool";
 
 const initialState = {
-  image: null,
   picture: Picture.empty(100, 100, "#f0f0f0"),
   scale: 4.0
 };
@@ -38,7 +36,7 @@ class SpriteEditor extends React.Component {
           <ZoomTool scale={this.state.scale} dispatch={this.changeScale} />
         </div>
         <div>
-          <ScalingPictureCanvas
+          <PictureCanvas
             picture={this.state.picture}
             scale={this.state.scale}
           />

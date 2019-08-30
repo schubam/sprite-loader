@@ -29,8 +29,7 @@ function finishLoad(file, dispatch) {
   reader.addEventListener("load", () => {
     let image = document.createElement("img");
     Object.assign(image, {
-      onload: () =>
-        dispatch({ image: image, picture: pictureFromImage(image) }),
+      onload: () => dispatch({ picture: pictureFromImage(image) }),
       src: reader.result
     });
   });
