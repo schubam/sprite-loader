@@ -13,6 +13,21 @@ function drawPicture(picture, canvas, scale) {
 }
 
 class PictureCanvas extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleMouseOver = this.handleMouseOver.bind(this);
+  }
+
+  handleMouseOver(e) {
+    const rect = this.refs.canvas.getBoundingClientRect();
+    const retval = {
+      x: Math.floor((e.clientX - rect.left) / this.props.scale),
+      y: Math.floor((e.clientY - rect.top) / this.props.scale)
+    };
+    console.log(retval);
+    return retval;
+  }
+
   componentDidMount() {
     this.updateCanvas();
   }
@@ -30,7 +45,7 @@ class PictureCanvas extends React.Component {
   }
 
   render() {
-    return <canvas ref="canvas"></canvas>;
+    return <canvas ref="canvas" onMouseOver={this.handleMouseOver}></canvas>;
   }
 }
 
