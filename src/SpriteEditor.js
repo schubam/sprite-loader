@@ -3,25 +3,12 @@ import PictureCanvas from "./PictureCanvas";
 import LoadButton from "./LoadButton";
 import ScalingPictureCanvas from "./ScalingPictureCanvas";
 import Picture from "./picture";
-
-const ZoomTool = ({ scale, dispatch }) => (
-  <div>
-    <label>Zoom:</label>
-    <input
-      type="number"
-      min={1}
-      max={20}
-      step={1}
-      onChange={dispatch}
-      value={scale}
-    />
-  </div>
-);
+import ZoomTool from "./ZoomTool";
 
 const initialState = {
   image: null,
   picture: Picture.empty(100, 100, "#f0f0f0"),
-  scale: 5
+  scale: 1.00
 };
 
 class SpriteEditor extends React.Component {
@@ -33,7 +20,7 @@ class SpriteEditor extends React.Component {
   }
 
   changeScale(e) {
-    this.setState({ scale: e.target.value });
+    this.setState({ scale: parseFloat(e.target.value) });
   }
 
   setImageData(action) {
