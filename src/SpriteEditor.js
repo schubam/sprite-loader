@@ -8,7 +8,7 @@ import ZoomTool from "./ZoomTool";
 const initialState = {
   image: null,
   picture: Picture.empty(100, 100, "#f0f0f0"),
-  scale: 1.00
+  scale: 4.0
 };
 
 class SpriteEditor extends React.Component {
@@ -33,18 +33,16 @@ class SpriteEditor extends React.Component {
   render() {
     return (
       <div>
-        <ZoomTool scale={this.state.scale} dispatch={this.changeScale} />
-        <br />
-        {this.state.image && <PictureCanvas image={this.state.image} />}
-        <br />
-        {this.state.picture && (
+        <div>
+          <LoadButton dispatch={this.setImageData} />
+          <ZoomTool scale={this.state.scale} dispatch={this.changeScale} />
+        </div>
+        <div>
           <ScalingPictureCanvas
             picture={this.state.picture}
             scale={this.state.scale}
           />
-        )}
-        <br />
-        <LoadButton dispatch={this.setImageData} />
+        </div>
       </div>
     );
   }
