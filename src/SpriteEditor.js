@@ -1,70 +1,63 @@
 import React from "react";
 import PictureCanvas from "./PictureCanvas";
+import LoadButton from "./LoadButton";
+import ScalingPictureCanvas from "./ScalingPictureCanvas";
+import Picture from "./picture";
 
-function elt(type, props, ...children) {
-  const dom = document.createElement(type);
-  if (props) {
-    Object.assign(dom, props);
-  }
-  for (let child of children) {
-    if (typeof child != "string") {
-      dom.appendChild(child);
-    } else {
-      dom.appendChild(document.createTextNode(child));
-    }
-  }
-  return dom;
-}
-
-function pictureFromImage(image) {
-  let width = Math.min(100, image.width);
-  let height = Math.min(100, image.height);
-  let canvas = elt("canvas", { width, height });
-  let context = canvas.getContext("2d");
-  context.drawImage(image, 0, 0);
-}
-
-function finishLoad(file, dispatch) {
-  if (file == null) return;
-
-  let reader = new FileReader();
-  reader.addEventListener("load", () => {
-    let image = elt("img", {
-      onload: () => dispatch({ picture: image }),
-      src: reader.result
-    });
-  });
-  reader.readAsDataURL(file);
-}
-
-const LoadButton = ({ dispatch }) => (
-  <input
-    type="file"
-    onChange={e => finishLoad(e.target.files[0], dispatch)}
-    label="📁 Load"
-  />
+const ZoomTool = ({ scale, dispatch }) => (
+  <div>
+    <label>Zoom:</label>
+    <input
+      type="number"
+      min={1}
+      max={20}
+      step={1}
+      onChange={dispatch}
+      value={scale}
+    />
+  </div>
 );
+
+const initialState = {
+  image: null,
+  picture: Picture.empty(100, 100, "#f0f0f0"),
+  scale: 5
+};
 
 class SpriteEditor extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      image: null
-    };
-    this.setImage = this.setImage.bind(this);
+    this.state = initialState;
+    this.setImageData = this.setImageData.bind(this);
+    this.changeScale = this.changeScale.bind(this);
   }
 
-  setImage(action) {
-    this.setState(() => {
-      return { image: action.picture };
+  changeScale(e) {
+    this.setState({ scale: e.target.value });
+  }
+
+  setImageData(action) {
+    this.setState({
+      image: action.image,
+      picture: action.picture
     });
   }
 
   render() {
     return (
       <div>
-        <PictureCanvas width={640} height={480} image={this.state.image} />
-        <LoadButton dispatch={this.setImage} />
+        <ZoomTool scale={this.state.scale} dispatch={this.changeScale} />
+        <br />
+        {this.state.image && <PictureCanvas image={this.state.image} />}
+        <br />
+        {this.state.picture && (
+          <ScalingPictureCanvas
+            picture={this.state.picture}
+            scale={this.state.scale}
+          />
+        )}
+        <br />
+        <LoadButton dispatch={this.setImageData} />
       </div>
     );
   }
