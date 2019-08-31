@@ -12,11 +12,11 @@ function drawPicture(picture, canvas, scale) {
   }
 }
 
-function drawCurrentGridPos(canvas, { x, y, w, h }, scale) {
+function drawGrid(canvas, w, h) {
   const context = canvas.getContext("2d");
   context.strokeStyle = "magenta";
   context.lineWidth = 1;
-  context.strokeRect(x * w, y * h, w, h);
+  context.strokeRect(0, 0, w, h);
 }
 
 function findRect(pos, scale) {
@@ -30,6 +30,8 @@ function findRect(pos, scale) {
 const PictureCanvas = ({ scale, picture }) => {
   const canvas = useRef(null);
   let [pos, setPos] = useState();
+  let [background, setBackground] = useState();
+  let [grid, setGrid] = useState();
 
   useEffect(() => {
     const handler = e => {
@@ -40,7 +42,11 @@ const PictureCanvas = ({ scale, picture }) => {
       };
 
       const gridPos = findRect(p, scale);
-      setPos(gridPos);
+      if (!pos) {
+        setPos(gridPos);
+      } else if (pos.x !== gridPos.x || pos.y !== gridPos.y) {
+        setPos(gridPos);
+      }
     };
     canvas.current.addEventListener("mousemove", handler);
 
@@ -50,11 +56,39 @@ const PictureCanvas = ({ scale, picture }) => {
   });
 
   useEffect(() => {
-    drawPicture(picture, canvas.current, scale);
-    if (pos) {
-      drawCurrentGridPos(canvas.current, pos, scale);
+    canvas.current.width = picture.width * scale;
+    canvas.current.height = picture.height * scale;
+
+    const buffer = document.createElement("canvas");
+    buffer.width = canvas.current.width;
+    buffer.height = canvas.current.height;
+
+    drawPicture(picture, buffer, scale);
+    setBackground(buffer);
+  }, [picture, scale]);
+
+  useEffect(() => {
+    const buffer = document.createElement("canvas");
+    const w = 16 * scale;
+    const h = 16 * scale;
+    buffer.width = w;
+    buffer.height = h;
+
+    drawGrid(buffer, w, h);
+    setGrid(buffer);
+  }, [scale]);
+
+  useEffect(() => {
+    if (background) {
+      const context = canvas.current.getContext("2d");
+      context.drawImage(background, 0, 0);
     }
-  });
+    if (pos && grid) {
+      const context = canvas.current.getContext("2d");
+      const { x, y, w, h } = pos;
+      context.drawImage(grid, x * w, y * h);
+    }
+  }, [grid, pos, background]);
 
   return <canvas ref={canvas}></canvas>;
 };
