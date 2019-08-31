@@ -5,7 +5,7 @@ import Picture from "./picture";
 import ZoomTool from "./ZoomTool";
 
 const initialState = {
-  picture: Picture.empty(100, 100, "#f0f0f0"),
+  picture: Picture.empty(160, 160, "#f0f0f0"),
   scale: 4.0
 };
 

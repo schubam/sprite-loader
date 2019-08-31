@@ -12,20 +12,39 @@ function drawPicture(picture, canvas, scale) {
   }
 }
 
+function drawCurrentGridPos(canvas, { x, y, w, h }, scale) {
+  const context = canvas.getContext("2d");
+  context.strokeStyle = "magenta";
+  context.lineWidth = 1;
+  context.strokeRect(x * w, y * h, w, h);
+}
+
+function findRect(pos, scale) {
+  const w = 16 * scale;
+  const h = 16 * scale;
+  const x = Math.floor((pos.x * scale) / w);
+  const y = Math.floor((pos.y * scale) / h);
+  return { x, y, w, h };
+}
+
 class PictureCanvas extends React.Component {
   constructor(props) {
     super(props);
-    this.handleMouseOver = this.handleMouseOver.bind(this);
+    this.state = {
+      gridPos: null
+    };
+    this.handleMouseMove = this.handleMouseMove.bind(this);
   }
 
-  handleMouseOver(e) {
+  handleMouseMove(e) {
     const rect = this.refs.canvas.getBoundingClientRect();
-    const retval = {
+    const pos = {
       x: Math.floor((e.clientX - rect.left) / this.props.scale),
       y: Math.floor((e.clientY - rect.top) / this.props.scale)
     };
-    console.log(retval);
-    return retval;
+
+    const gridPos = findRect(pos, this.props.scale);
+    this.setState({ gridPos });
   }
 
   componentDidMount() {
@@ -37,15 +56,18 @@ class PictureCanvas extends React.Component {
   }
 
   updateCanvas() {
-    const ctx = this.refs.canvas.getContext("2d");
-    this.refs.canvas.width = this.props.picture.width * this.props.scale;
-    this.refs.canvas.height = this.props.picture.height * this.props.scale;
-    ctx.clearRect(0, 0, this.props.picture.width, this.props.picture.height);
     drawPicture(this.props.picture, this.refs.canvas, this.props.scale);
+    if (this.state.gridPos) {
+      drawCurrentGridPos(
+        this.refs.canvas,
+        this.state.gridPos,
+        this.props.scale
+      );
+    }
   }
 
   render() {
-    return <canvas ref="canvas" onMouseOver={this.handleMouseOver}></canvas>;
+    return <canvas ref="canvas" onMouseMove={this.handleMouseMove}></canvas>;
   }
 }
 
