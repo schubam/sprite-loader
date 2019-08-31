@@ -22,10 +22,7 @@ class SpriteEditor extends React.Component {
   }
 
   setImageData(action) {
-    this.setState({
-      image: action.image,
-      picture: action.picture
-    });
+    this.setState({ picture: action.picture });
   }
 
   render() {
