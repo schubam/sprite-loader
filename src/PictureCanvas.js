@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 function drawPicture(picture, canvas, scale) {
   canvas.width = picture.width * scale;
@@ -27,48 +27,36 @@ function findRect(pos, scale) {
   return { x, y, w, h };
 }
 
-class PictureCanvas extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      gridPos: null
+const PictureCanvas = ({ scale, picture }) => {
+  const canvas = useRef(null);
+  let [pos, setPos] = useState();
+
+  useEffect(() => {
+    const handler = e => {
+      const rect = canvas.current.getBoundingClientRect();
+      const p = {
+        x: Math.floor((e.clientX - rect.left) / scale),
+        y: Math.floor((e.clientY - rect.top) / scale)
+      };
+
+      const gridPos = findRect(p, scale);
+      setPos(gridPos);
     };
-    this.handleMouseMove = this.handleMouseMove.bind(this);
-  }
+    canvas.current.addEventListener("mousemove", handler);
 
-  handleMouseMove(e) {
-    const rect = this.refs.canvas.getBoundingClientRect();
-    const pos = {
-      x: Math.floor((e.clientX - rect.left) / this.props.scale),
-      y: Math.floor((e.clientY - rect.top) / this.props.scale)
+    return () => {
+      canvas.current.removeEventListener("mousemove", handler);
     };
+  });
 
-    const gridPos = findRect(pos, this.props.scale);
-    this.setState({ gridPos });
-  }
-
-  componentDidMount() {
-    this.updateCanvas();
-  }
-
-  componentDidUpdate() {
-    this.updateCanvas();
-  }
-
-  updateCanvas() {
-    drawPicture(this.props.picture, this.refs.canvas, this.props.scale);
-    if (this.state.gridPos) {
-      drawCurrentGridPos(
-        this.refs.canvas,
-        this.state.gridPos,
-        this.props.scale
-      );
+  useEffect(() => {
+    drawPicture(picture, canvas.current, scale);
+    if (pos) {
+      drawCurrentGridPos(canvas.current, pos, scale);
     }
-  }
+  });
 
-  render() {
-    return <canvas ref="canvas" onMouseMove={this.handleMouseMove}></canvas>;
-  }
-}
+  return <canvas ref={canvas}></canvas>;
+};
 
 export default PictureCanvas;
