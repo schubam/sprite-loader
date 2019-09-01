@@ -27,7 +27,7 @@ class SpriteEditor extends React.Component {
 
   render() {
     return (
-      <div>
+      <>
         <div>
           <LoadButton dispatch={this.setImageData} />
           <ZoomTool scale={this.state.scale} dispatch={this.changeScale} />
@@ -38,7 +38,7 @@ class SpriteEditor extends React.Component {
             scale={this.state.scale}
           />
         </div>
-      </div>
+      </>
     );
   }
 }
